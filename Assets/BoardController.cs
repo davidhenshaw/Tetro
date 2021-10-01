@@ -282,7 +282,7 @@ public class BoardController : MonoBehaviour
 
     private void QuickDrop(Tetromino t)
     {
-        int shortestDist = _height;
+        int shortestDist = _height*2;
 
         foreach(Mino mino in t.ChildMinos)
         {
