@@ -9,6 +9,7 @@ public class Mino : MonoBehaviour
     Tetromino _parentTetro;
     Grid _grid;
     BoardController _board;
+    ParticleSystem _quickDropEffect;
 
     public bool snapToGrid = true;
     [SerializeField] bool _isPivot = false;
@@ -21,6 +22,7 @@ public class Mino : MonoBehaviour
         _parentTetro = GetComponentInParent<Tetromino>();
         _grid = FindObjectOfType<Grid>();
         _board = FindObjectOfType<BoardController>();
+        _quickDropEffect = GetComponent<ParticleSystem>();
     }
 
     void Update()
@@ -33,6 +35,11 @@ public class Mino : MonoBehaviour
     {
         //Update transform based on cell position
         transform.position = _grid.GetCellCenterLocal(_cellPos) + _grid.transform.position;
+    }
+
+    public void PlayQuickDrop()
+    {
+        _quickDropEffect.Play();
     }
 
     public void SetCellPosition(Vector3Int newPos)

@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _symbol: {fileID: 3335442268717752778, guid: 37013f3d401048a4b8fcfe95fcdea85b, type: 3}
+  _particleSystem: {fileID: 2925822693482051891}
 --- !u!1001 &3335442268470718020
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133,17 +134,17 @@ PrefabInstance:
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.2588236
+      value: 0.27968082
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.6597475
+      value: 0.7924528
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.7607843
+      value: 0.19063722
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040dd898a1c2a274ba7dab7dcfe65a38, type: 3}
@@ -243,17 +244,17 @@ PrefabInstance:
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.2588236
+      value: 0.27968082
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.6597475
+      value: 0.7924528
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.7607843
+      value: 0.19063722
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040dd898a1c2a274ba7dab7dcfe65a38, type: 3}
@@ -353,17 +354,17 @@ PrefabInstance:
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.2588236
+      value: 0.27968082
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.6597475
+      value: 0.7924528
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.7607843
+      value: 0.19063722
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040dd898a1c2a274ba7dab7dcfe65a38, type: 3}
@@ -463,17 +464,17 @@ PrefabInstance:
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.2588236
+      value: 0.27968082
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.6597475
+      value: 0.7924528
       objectReference: {fileID: 0}
     - target: {fileID: 8864241245946749175, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.7607843
+      value: 0.19063722
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040dd898a1c2a274ba7dab7dcfe65a38, type: 3}
@@ -482,4 +483,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8864241245946749173, guid: 040dd898a1c2a274ba7dab7dcfe65a38,
     type: 3}
   m_PrefabInstance: {fileID: 6146783885921359191}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6803642178131068904
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6146783886586254772}
+    m_Modifications:
+    - target: {fileID: 3897552625169449034, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_Name
+      value: Effects (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7897739538615760515, guid: b354170a1662107478023fbacf292757,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b354170a1662107478023fbacf292757, type: 3}
+--- !u!198 &2925822693482051891 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8570905067074895579, guid: b354170a1662107478023fbacf292757,
+    type: 3}
+  m_PrefabInstance: {fileID: 6803642178131068904}
   m_PrefabAsset: {fileID: 0}

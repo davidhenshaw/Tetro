@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12323, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: Tetramino Colors
+  m_EditorClassIdentifier: 
+  m_Presets:
+  - m_Name: I-Block
+    m_Color: {r: 0.2588236, g: 0.7227088, b: 0.7607843, a: 1}
+  - m_Name: J-Block
+    m_Color: {r: 0.19063722, g: 0.27968082, b: 0.7924528, a: 1}
+  - m_Name: L-Block
+    m_Color: {r: 0.8396226, g: 0.47557658, b: 0.099012084, a: 1}
+  - m_Name: O-Block
+    m_Color: {r: 0.89199996, g: 0.82339525, b: 0.30327997, a: 1}
+  - m_Name: S-Block
+    m_Color: {r: 0.15686275, g: 0.8352941, b: 0.25331515, a: 1}
+  - m_Name: T-Block
+    m_Color: {r: 0.6370652, g: 0.14901961, b: 0.8039216, a: 1}
+  - m_Name: Z-Block
+    m_Color: {r: 0.7735849, g: 0.105820596, b: 0.13952799, a: 1}

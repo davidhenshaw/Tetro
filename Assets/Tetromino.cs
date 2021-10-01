@@ -12,6 +12,8 @@ public class Tetromino : MonoBehaviour
     [SerializeField] GameObject _symbol;
     GameObject _symbolInstance;
 
+    [SerializeField] ParticleSystem _particleSystem;
+
     public List<Mino> ChildMinos { get => _minos; }
     Dictionary<Mino, Vector3Int> _origCellPositions;
 
@@ -149,10 +151,13 @@ public class Tetromino : MonoBehaviour
     {
         _board.AddMinos(this);
 
-        foreach(Mino m in _minos)
+        foreach(var t in GetComponentsInChildren<Transform>())
         {
-            m.transform.parent = _board.transform;
+            t.parent = _board.transform;
         }
+
+        //TODO: Insert effect that plays
+        _particleSystem.Play();
 
         Destroy(gameObject);
     }

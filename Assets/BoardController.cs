@@ -38,6 +38,14 @@ public class BoardController : MonoBehaviour
     float _lockTimeFactor = 0.9f;
     float _currLockTime;
 
+    [Header("Sounds")]
+    [SerializeField] AudioClip _blockLocked;
+    [SerializeField] AudioClip _blockMoved;
+    [SerializeField] AudioClip _blockRotated;
+    [SerializeField] AudioClip _quickDrop;
+    [SerializeField] AudioClip _storeBank;
+    AudioSource _audioSource;
+
     public int Width { get => _width; }
     public int Height { get => _height; }
 
@@ -51,6 +59,7 @@ public class BoardController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _audioSource = GetComponent<AudioSource>();
         quickDropInput.PatternDetected += QuickDrop;
         _currTetro = _spawner.GetNextTetromino();
     }
@@ -92,6 +101,7 @@ public class BoardController : MonoBehaviour
             {
                 //Explode Tetromino
                 //_currTetro.Explode();
+                _audioSource.PlayOneShot(_blockLocked);
 
                 //Start lock timer
                 _lockMode = true;
@@ -103,7 +113,7 @@ public class BoardController : MonoBehaviour
                 return;
 
             List<int> emptyRows = ClearLines();
-            ShiftMinosDown(emptyRows);
+            ShiftRowsDown(emptyRows);
 
             _currTetro = _spawner.GetNextTetromino();
 
@@ -160,7 +170,10 @@ public class BoardController : MonoBehaviour
                 currInputTime = 0;
 
                 if (didMove)
+                {
+                    _audioSource.PlayOneShot(_blockMoved);
                     _currLockTime = 0;
+                }
             }
         }
 
@@ -173,7 +186,10 @@ public class BoardController : MonoBehaviour
                 currInputTime = 0;
 
                 if (didMove)
+                {
+                    _audioSource.PlayOneShot(_blockMoved);
                     _currLockTime = 0;
+                }
             }
         }
 
@@ -188,7 +204,10 @@ public class BoardController : MonoBehaviour
             didRotate = _currTetro.RotateClockwise();
 
             if(didRotate)
+            {
+                _audioSource.PlayOneShot(_blockRotated);
                 _currLockTime = 0;
+            }
         }
 
         if (Input.GetButtonDown("CCW Rotate"))
@@ -196,7 +215,10 @@ public class BoardController : MonoBehaviour
             didRotate = _currTetro.RotateCounterClockwise();
 
             if (didRotate)
+            {
+                _audioSource.PlayOneShot(_blockRotated);
                 _currLockTime = 0;
+            }
         }
 
         if(Input.GetButtonDown("Store"))
@@ -207,9 +229,11 @@ public class BoardController : MonoBehaviour
             if(_bankedTetro)
             {
                 SwapBankedTetro();
+                _audioSource.PlayOneShot(_storeBank);
             }
             else
             {
+                _audioSource.PlayOneShot(_storeBank);
                 BankCurrentTetro();
             }
         }
@@ -224,8 +248,6 @@ public class BoardController : MonoBehaviour
 
     private void HandleLockMode()
     {
-
-
         _currLockTime += Time.deltaTime;
 
         if ((_currLockTime >= _lockTime))
@@ -282,6 +304,9 @@ public class BoardController : MonoBehaviour
 
             // Find the shortest yDiff each loop
             shortestDist = shortestDist > yDiff ? yDiff : shortestDist;
+
+            // Play quickdrop particle effect
+            mino.PlayQuickDrop();
         }
 
         // Move the tetromino down
@@ -291,6 +316,7 @@ public class BoardController : MonoBehaviour
         _currLockTime = 100;
 
         QuickDropped?.Invoke();
+        _audioSource.PlayOneShot(_quickDrop);
     }
 
     Vector3Int GetHighestFreeCell(int col)
@@ -455,7 +481,7 @@ public class BoardController : MonoBehaviour
         return rowsCleared;
     }
 
-    void ShiftMinosDown(List<int> emptyRows)
+    void ShiftRowsDown(List<int> emptyRows)
     {//Traverse emptyRow list backward to avoid checking it each loop
         for(int i = emptyRows.Count - 1; i >= 0; i--)
         {
