@@ -30,15 +30,18 @@ public class GameSession : MonoBehaviour
     [SerializeField] float baseTickRate;
     [SerializeField] float fastTickMultiplier;
     [SerializeField] float levelMultiplier = 0.8f;
+    [SerializeField] float lineClearDelay = 0.5f;
     float fastTickRate;
     float currLockTimer;
     GameTimer _gameTimer;
     float tickTimer;
     float currTickTime;
+    float currDelayTime;
 
     //State
     bool isGameOver = false;
     bool isPaused = false;
+    bool delayMode = false;
 
     private void Awake()
     {
@@ -58,10 +61,32 @@ public class GameSession : MonoBehaviour
 
     void Update()
     {
-        if(!isGameOver && !isPaused)
+        if(!isGameOver && !isPaused && !delayMode)
             UpdateTickTimer();
 
         UpdateInput();
+
+        if (delayMode)
+            UpdateDelayTimer();
+        else
+            CancelDelayMode();
+    }
+
+    private void CancelDelayMode()
+    {
+        delayMode = false;
+        currDelayTime = 0;
+    }
+
+    private void UpdateDelayTimer()
+    {
+        currDelayTime += Time.deltaTime;
+
+        if(currDelayTime >= lineClearDelay)
+        {
+            CancelDelayMode();
+            SkipToNextTick();
+        }
     }
 
     void UpdateTickTimer()
@@ -116,9 +141,14 @@ public class GameSession : MonoBehaviour
         GameReset?.Invoke();
     }
 
-    void OnQuickDrop()
+    void SkipToNextTick()
     {
         currTickTime = tickTimer;
+    }
+
+    void OnQuickDrop()
+    {
+        SkipToNextTick();
     }
 
     void OnGameOver()
@@ -159,6 +189,8 @@ public class GameSession : MonoBehaviour
     {
         if (lines <= 0)
             return;
+        //Activate line clear delay
+        delayMode = true;
 
         int baseScore = _baseScores[lines - 1];
 

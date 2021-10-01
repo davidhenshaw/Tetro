@@ -863,7 +863,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 7497b06c2daeeb14989f92e1558427ec, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.743
+  m_Volume: 0.593
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -2408,7 +2408,7 @@ MonoBehaviour:
   _topMargin: 3
   inputRepeatTime: 0.09
   quickDropInput: {fileID: 1122435145}
-  _baseLockTime: 0.8
+  _lockDelay: 0.5
   _blockLocked: {fileID: 8300000, guid: 9468f7cc4bf1d5b4b9bbe8dafc503fb3, type: 3}
   _blockMoved: {fileID: 8300000, guid: 409f0efae24768647a2e77e04efd3e64, type: 3}
   _blockRotated: {fileID: 8300000, guid: 81a1e77db6274dd44b1ff1dc51cbac1a, type: 3}
@@ -3378,12 +3378,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tetroPrefabs:
   - {fileID: 3335442268717752776, guid: 43844e732351060449e7029dca1f2f0f, type: 3}
-  - {fileID: 434539965159709479, guid: f55fecb8261705641bd74276b6f58680, type: 3}
+  - {fileID: 3335442268717752776, guid: f0f4292893f1eda4f8a72b9dcdb63409, type: 3}
+  - {fileID: 9017921317924420244, guid: 1e87adfa8759b6a439f12059899b09c2, type: 3}
+  - {fileID: 7026475934544613561, guid: 678e1a87f5aa4f8409c149cde9538ca6, type: 3}
   - {fileID: 2030121579620820182, guid: fca1c736b4c0e2644b193b03e09571e0, type: 3}
   - {fileID: 5131824944595962472, guid: 8234e1cb2d251f7488964b64504bb36b, type: 3}
-  - {fileID: 7026475934544613561, guid: 678e1a87f5aa4f8409c149cde9538ca6, type: 3}
-  - {fileID: 9017921317924420244, guid: 1e87adfa8759b6a439f12059899b09c2, type: 3}
-  - {fileID: 3335442268717752776, guid: f0f4292893f1eda4f8a72b9dcdb63409, type: 3}
+  - {fileID: 434539965159709479, guid: f55fecb8261705641bd74276b6f58680, type: 3}
   queueSize: 3
   _symbolPlacements:
   - {fileID: 472933574}
@@ -3479,11 +3479,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _board: {fileID: 1244939822}
-  linesPerLevel: 10
+  linesPerLevel: 1
   levelBonus: 40
   baseTickRate: 0.8
   fastTickMultiplier: 0.15
   levelMultiplier: 0.72
+  lineClearDelay: 1
 --- !u!4 &1898728158
 Transform:
   m_ObjectHideFlags: 0

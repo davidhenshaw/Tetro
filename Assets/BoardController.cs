@@ -33,10 +33,9 @@ public class BoardController : MonoBehaviour
 
     float currInputTime = 0;
     private bool _lockMode = false;
-    [SerializeField] float _baseLockTime;
-    float _lockTime;
-    float _lockTimeFactor = 0.9f;
+    [SerializeField] float _lockDelay = 0.5f;
     float _currLockTime;
+    List<int> _emptyRows = new List<int>();
 
     [Header("Sounds")]
     [SerializeField] AudioClip _blockLocked;
@@ -80,7 +79,6 @@ public class BoardController : MonoBehaviour
 
     public void Reset()
     {
-        _lockTime = _baseLockTime;
         _lockMode = false;
 
         BoardReset?.Invoke();
@@ -91,18 +89,16 @@ public class BoardController : MonoBehaviour
         //Note: Tetrominos destroy (Explode) when they can no longer move down
         // its children minos get fixed to the board while the parent tetromino obj is destroyed
 
-        if(_currTetro)//If we currently have a tetromino to control
+        ShiftRowsDown();
+
+        if (_currTetro)//If we currently have a tetromino to control
         {
             if(_currTetro.MoveDown())
-            {
-                //Tetromino successfully moved down
+            {//Tetromino successfully moved down
+                CancelLockMode();
             }
             else
             {
-                //Explode Tetromino
-                //_currTetro.Explode();
-                _audioSource.PlayOneShot(_blockLocked);
-
                 //Start lock timer
                 _lockMode = true;
             }
@@ -112,19 +108,12 @@ public class BoardController : MonoBehaviour
             if (CheckGameOver())
                 return;
 
-            List<int> emptyRows = ClearLines();
-            ShiftRowsDown(emptyRows);
-
             _currTetro = _spawner.GetNextTetromino();
 
             // restore player's ability to bank
             _canBank = true;
 
             CancelLockMode();
-
-            // Adjust the lock time so player has less time to decide
-            // Mino placement as time goes on
-            _lockTime = _baseLockTime * Mathf.Pow(_lockTimeFactor, GameSession.instance.GetCurrentLevel());
         }
     }
 
@@ -250,12 +239,13 @@ public class BoardController : MonoBehaviour
     {
         _currLockTime += Time.deltaTime;
 
-        if ((_currLockTime >= _lockTime))
+        if ((_currLockTime >= _lockDelay))
         {
             _currTetro?.Explode();
+            _emptyRows = ClearLines();
 
-            _lockMode = false;
-            _currLockTime = 0;
+            CancelLockMode();
+            _audioSource.PlayOneShot(_blockLocked);
         }
     }
 
@@ -312,8 +302,8 @@ public class BoardController : MonoBehaviour
         // Move the tetromino down
         t.MoveDown(shortestDist);
 
-        //_currTetro.Explode();
-        _currLockTime = 100;
+        _currLockTime = _lockDelay; //max out the lock delay timer so that next tick is immediate
+        _lockMode = true;
 
         QuickDropped?.Invoke();
         _audioSource.PlayOneShot(_quickDrop);
@@ -431,7 +421,14 @@ public class BoardController : MonoBehaviour
     {
         foreach (Mino m in t.ChildMinos)
         {
-            _minoPositions.Add(m.CellPos, m);
+            try
+            {
+                _minoPositions.Add(m.CellPos, m);
+            }
+            catch(ArgumentException e)
+            {
+                Debug.LogError("Cannot add mino to board. Position occupied.");
+            }
         }
     }
 
@@ -481,15 +478,17 @@ public class BoardController : MonoBehaviour
         return rowsCleared;
     }
 
-    void ShiftRowsDown(List<int> emptyRows)
-    {//Traverse emptyRow list backward to avoid checking it each loop
-        for(int i = emptyRows.Count - 1; i >= 0; i--)
+    void ShiftRowsDown()
+    {//Traverse emptyRow list backward to drop highest rows first
+        for(int i = _emptyRows.Count - 1; i >= 0; i--)
         {
-            for(int currRow = emptyRows[i] + 1; currRow < _height; currRow++)
+            for(int currRow = _emptyRows[i] + 1; currRow < _height; currRow++)
             {
                 ShiftRowDown(currRow);
             }
         }
+
+        _emptyRows.Clear();
     }
 
     void ShiftRowDown(int row)
