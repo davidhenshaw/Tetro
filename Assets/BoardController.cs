@@ -43,7 +43,11 @@ public class BoardController : MonoBehaviour
     [SerializeField] AudioClip _blockRotated;
     [SerializeField] AudioClip _quickDrop;
     [SerializeField] AudioClip _storeBank;
+    [SerializeField] AudioClip _lineClear;
     AudioSource _audioSource;
+
+    [Header("Effects")]
+    [SerializeField] GameObject _lineClearEffect;
 
     public int Width { get => _width; }
     public int Height { get => _height; }
@@ -470,12 +474,21 @@ public class BoardController : MonoBehaviour
                 }
 
                 rowsCleared.Add(row);
+
+                SpawnClearEffect(row);
             }
         }
 
         LinesCleared?.Invoke(rowsCleared.Count);
 
         return rowsCleared;
+    }
+
+    void SpawnClearEffect(int row)
+    {
+        var spawnPos = _grid.CellToWorld(new Vector3Int(_width / 2, row, 0)); // Middle of the current row
+        Instantiate(_lineClearEffect, spawnPos, Quaternion.identity);
+        Instantiate(_lineClearEffect, spawnPos, Quaternion.Euler(0,0,180));
     }
 
     void ShiftRowsDown()

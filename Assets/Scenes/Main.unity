@@ -858,12 +858,12 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 333765010}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 7497b06c2daeeb14989f92e1558427ec, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.593
+  m_Volume: 0.502
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -2414,6 +2414,9 @@ MonoBehaviour:
   _blockRotated: {fileID: 8300000, guid: 81a1e77db6274dd44b1ff1dc51cbac1a, type: 3}
   _quickDrop: {fileID: 8300000, guid: 4fca483f6c41b5e458c9427236a90ca0, type: 3}
   _storeBank: {fileID: 8300000, guid: fc451bb9ba1d76743b39859f66732eff, type: 3}
+  _lineClear: {fileID: 0}
+  _lineClearEffect: {fileID: 6176400795792156762, guid: 451821af184b09e419b1306f008a1244,
+    type: 3}
 --- !u!82 &1244939823
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2581,7 +2584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1466988661
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3479,7 +3482,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _board: {fileID: 1244939822}
-  linesPerLevel: 1
+  linesPerLevel: 10
   levelBonus: 40
   baseTickRate: 0.8
   fastTickMultiplier: 0.15
