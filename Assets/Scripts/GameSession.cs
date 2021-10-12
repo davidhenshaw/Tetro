@@ -20,7 +20,7 @@ public class GameSession : MonoBehaviour
     [SerializeField] int linesPerLevel = 1;
     [SerializeField] int levelBonus = 40;
     int currScore = 0;
-    int currLevel = 0;
+    int currLevel = 1;
     int numLinesCleared = 0;
     int softDropMultiplier = 1;
     int hardDropMultiplier = 2;
@@ -65,7 +65,7 @@ public class GameSession : MonoBehaviour
         fastTickRate = tickTimer * fastTickMultiplier;
 
         _board.Lost += OnGameOver;
-        _board.LinesCleared += OnBoardAction;
+        _board.BoardAction += OnBoardAction;
         _board.QuickDropped += OnQuickDrop;
     }
 
@@ -195,23 +195,21 @@ public class GameSession : MonoBehaviour
         }
     }
 
-    void OnBoardAction(int lines)
+    void OnBoardAction(BoardAction action)
     {
-        if (lines <= 0)
-            return;
         //Activate line clear delay
         delayMode = true;
 
-        int baseScore = _baseScores[lines - 1];
+        int baseScore = _boardActionLUT[action.Type];
 
-        int scoreToAdd = baseScore + currLevel * levelBonus;
+        int scoreToAdd = baseScore * currLevel;
 
         int prevScore = currScore;
         currScore += scoreToAdd;
 
         ScoreIncreased?.Invoke(prevScore, currScore);
 
-        numLinesCleared += lines;
+        numLinesCleared += action.LinesCleared;
 
         if(numLinesCleared >= linesPerLevel)
         {
@@ -225,7 +223,7 @@ public class GameSession : MonoBehaviour
         currLevel+= numLevels;
         LevelUp?.Invoke(currLevel);
 
-        // Decrease tick rate of board to make it go faster
+        // Increase tick rate of board to make it go faster
         //baseTickRate *= levelMultiplier;
         tickTimer = baseTickRate * Mathf.Pow(levelMultiplier, currLevel);
         fastTickRate = tickTimer * fastTickMultiplier;
@@ -235,8 +233,6 @@ public class GameSession : MonoBehaviour
 public enum BoardActionType
 {
     Single=1, Double=2, Triple=3, Tetris=4, 
-    T_Spin_Mini, T_Spin,
-    T_Spin_Mini_Single, T_Spin_Single,
-    T_Spin_Mini_Double, T_Spin_Double,
-    T_Spin_Triple
+    T_Spin_Mini, T_Spin_Mini_Single, T_Spin_Mini_Double, 
+    T_Spin, T_Spin_Single, T_Spin_Double,T_Spin_Triple, Null
 }

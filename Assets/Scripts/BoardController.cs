@@ -7,9 +7,8 @@ public class BoardController : MonoBehaviour
 {
     public event Action Lost;
     public event Action BoardReset;
-    public event Action<int> LinesCleared;
-    public event Action QuickDropped;
     public event Action<BoardAction> BoardAction;
+    public event Action QuickDropped;
 
     bool _canBank = true;
     bool isPaused = false;
@@ -64,7 +63,6 @@ public class BoardController : MonoBehaviour
     void Start()
     {
         _audioSource = GetComponent<AudioSource>();
-        quickDropInput.PatternDetected += QuickDrop;
         _currTetro = _spawner.GetNextTetromino();
     }
 
@@ -453,6 +451,7 @@ public class BoardController : MonoBehaviour
     List<int> ClearLines()
     {
         List<int> rowsCleared = new List<int>();
+        BoardAction action;
 
         for(int row = 0; row < _height; row++)
         {
@@ -487,7 +486,8 @@ public class BoardController : MonoBehaviour
         
         if(rowsCleared.Count > 0)
         {
-            LinesCleared?.Invoke(rowsCleared.Count);
+            action = new BoardAction(rowsCleared.Count, false, false);
+            BoardAction?.Invoke(action);
             _audioSource.PlayOneShot(_lineClear);
         }
 
@@ -532,7 +532,66 @@ public class BoardController : MonoBehaviour
     }
 }
 
-public struct BoardAction
+public class BoardAction
 {
-    public BoardActionType type;
+    public BoardActionType Type { get; private set; }
+    public bool Difficult { get; private set; }
+    public int LinesCleared { get; private set; }
+    public bool TSpin { get; private set; }
+
+    public BoardAction Next {get; set;}
+    public BoardAction Prev {get; set;}
+
+    public BoardAction (int lines, bool t_spin, bool wallKick)
+    {
+        LinesCleared = lines;
+        TSpin = t_spin;
+        Type = ClassifyType(lines, t_spin, wallKick);
+        Difficult = (t_spin && lines > 0) || (lines >= 4);
+    }
+
+    private BoardActionType ClassifyType(int lines, bool tSpin, bool wallKick)
+    {
+        if(tSpin && wallKick)
+        {
+            switch(lines)
+            {
+                case 0:
+                    return BoardActionType.T_Spin_Mini;
+                case 1:
+                    return BoardActionType.T_Spin_Mini_Single;
+                case 2:
+                    return BoardActionType.T_Spin_Mini_Double;
+            }
+        }
+
+        if (tSpin && !wallKick)
+        {
+            switch (lines)
+            {
+                case 0:
+                    return BoardActionType.T_Spin;
+                case 1:
+                    return BoardActionType.T_Spin_Single;
+                case 2:
+                    return BoardActionType.T_Spin_Double;
+                case 3:
+                    return BoardActionType.T_Spin_Triple;
+            }
+        }
+
+        switch(lines)
+        {
+            case 1:
+                return BoardActionType.Single;
+            case 2:
+                return BoardActionType.Double;
+            case 3:
+                return BoardActionType.Triple;
+            case 4:
+                return BoardActionType.Tetris;
+        }
+
+        return BoardActionType.Null;
+    }
 }
