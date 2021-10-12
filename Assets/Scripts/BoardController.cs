@@ -8,7 +8,8 @@ public class BoardController : MonoBehaviour
     public event Action Lost;
     public event Action BoardReset;
     public event Action<BoardAction> BoardAction;
-    public event Action QuickDropped;
+    public event Action TetroMovedDown;
+    public event Action<int> HardDropped;
 
     bool _canBank = true;
     bool isPaused = false;
@@ -97,6 +98,7 @@ public class BoardController : MonoBehaviour
             if(_currTetro.MoveDown())
             {//Tetromino successfully moved down
                 CancelLockMode();
+                TetroMovedDown?.Invoke();
             }
             else
             {
@@ -139,7 +141,7 @@ public class BoardController : MonoBehaviour
                 _ghostMinos[i].SetCellPosition(children[i].CellPos);
             }
 
-            QuickDropGhostMinos();
+            HardDropGhostMinos();
         }
         else
         {// Make ghost minos disappear
@@ -188,7 +190,7 @@ public class BoardController : MonoBehaviour
         if (Input.GetButtonDown("Hard Drop"))
         {
             if (_currTetro != null)
-                QuickDrop();
+                HardDrop();
         }
 
         if (Input.GetButtonDown("CW Rotate"))
@@ -249,21 +251,52 @@ public class BoardController : MonoBehaviour
 
         if ((_currLockTime >= _lockDelay))
         {
+            TetrominoAction tetroAction = _currTetro.LastAction;
+            bool t_spin = CheckTSpin(_currTetro);
             _currTetro?.Explode();
             _emptyRows = ClearLines();
+
+            BoardAction boardAction = new BoardAction(_emptyRows.Count, t_spin, tetroAction);
+            BoardAction?.Invoke(boardAction);
 
             CancelLockMode();
             _audioSource.PlayOneShot(_blockLocked);
         }
     }
 
-    void QuickDrop()
-    {
-        if(!isPaused)
-            QuickDrop(_currTetro);
+    bool CheckTSpin(Tetromino tetro)
+    {// Uses 3-Corner T algorithm. Checks whether 3 of the spaces diagonal to the pivot are occupied
+        if (!tetro.PivotMino)
+            return false;
+
+        var pivot = tetro.PivotMino.CellPos;
+        var lastAction = tetro.LastAction;
+        int numOccupied = 0;
+
+        Vector3Int[] tests = new Vector3Int[] {
+            pivot + new Vector3Int(-1, 1, 0),
+            pivot + new Vector3Int(1, 1, 0),
+            pivot + new Vector3Int(1, -1, 0),
+            pivot + new Vector3Int(-1, -1, 0),
+        };
+
+        foreach(Vector3Int pos in tests)
+        {
+            if (!IsCellFree(pos))
+                numOccupied++;
+        }
+
+        return (numOccupied >= 3) && 
+            (lastAction == TetrominoAction.Rotate_NoWallKick || lastAction == TetrominoAction.Rotate_WallKick);
     }
 
-    void QuickDropGhostMinos()
+    void HardDrop()
+    {
+        if(!isPaused)
+            HardDrop(_currTetro);
+    }
+
+    void HardDropGhostMinos()
     {
         int shortestDist = _height + _topMargin;
         Vector3Int highest = new Vector3Int(0,0,0);
@@ -288,7 +321,7 @@ public class BoardController : MonoBehaviour
 
     }
 
-    private void QuickDrop(Tetromino t)
+    private void HardDrop(Tetromino t)
     {
         int shortestDist = _height*2;
 
@@ -313,7 +346,7 @@ public class BoardController : MonoBehaviour
         _currLockTime = _lockDelay; //max out the lock delay timer so that next tick is immediate
         _lockMode = true;
 
-        QuickDropped?.Invoke();
+        HardDropped?.Invoke(shortestDist);
         _audioSource.PlayOneShot(_quickDrop);
     }
 
@@ -486,8 +519,6 @@ public class BoardController : MonoBehaviour
         
         if(rowsCleared.Count > 0)
         {
-            action = new BoardAction(rowsCleared.Count, false, false);
-            BoardAction?.Invoke(action);
             _audioSource.PlayOneShot(_lineClear);
         }
 
@@ -539,13 +570,21 @@ public class BoardAction
     public int LinesCleared { get; private set; }
     public bool TSpin { get; private set; }
 
-    public BoardAction Next {get; set;}
-    public BoardAction Prev {get; set;}
-
     public BoardAction (int lines, bool t_spin, bool wallKick)
     {
         LinesCleared = lines;
         TSpin = t_spin;
+        Type = ClassifyType(lines, t_spin, wallKick);
+        Difficult = (t_spin && lines > 0) || (lines >= 4);
+    }
+
+
+    public BoardAction(int lines, bool t_spin, TetrominoAction tetroAction)
+    {
+        LinesCleared = lines;
+        TSpin = t_spin;
+        bool wallKick = tetroAction == TetrominoAction.Rotate_WallKick;
+
         Type = ClassifyType(lines, t_spin, wallKick);
         Difficult = (t_spin && lines > 0) || (lines >= 4);
     }

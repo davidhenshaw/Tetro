@@ -6,7 +6,7 @@ using UnityEngine;
 public class Tetromino : MonoBehaviour
 {
     List<Mino> _minos;
-    Mino pivotMino;
+    Mino _pivotMino;
     Grid _grid;
     BoardController _board;
     [SerializeField] GameObject _symbol;
@@ -18,6 +18,9 @@ public class Tetromino : MonoBehaviour
 
     public List<Mino> ChildMinos { get => _minos; }
     public int RotationState { get => _rotationState; }
+    public TetrominoAction LastAction { get; private set; }
+    public Mino PivotMino { get => _pivotMino; }
+
     Dictionary<Mino, Vector3Int> _origCellPositions;
 
     private void Awake()
@@ -38,7 +41,7 @@ public class Tetromino : MonoBehaviour
         {
             if (m.IsPivot)
             {
-                pivotMino = m;
+                _pivotMino = m;
             }
 
             _origCellPositions.Add(m, m.CellPos);
@@ -101,6 +104,8 @@ public class Tetromino : MonoBehaviour
             m.MoveLeft();
         }
 
+        LastAction = TetrominoAction.Input;
+
         return true;
     }
 
@@ -118,6 +123,8 @@ public class Tetromino : MonoBehaviour
         {
             m.MoveRight();
         }
+
+        LastAction = TetrominoAction.Input;
 
         return true;
     }
@@ -138,6 +145,8 @@ public class Tetromino : MonoBehaviour
         {
             m.MoveDown();
         }
+
+        LastAction = TetrominoAction.Gravity;
 
         return true;
     }
@@ -171,16 +180,18 @@ public class Tetromino : MonoBehaviour
     //      3. Negating the new relative y value
     public bool RotateClockwise()
     {
-        if (pivotMino == null)
+        if (_pivotMino == null)
             return false;
 
         Vector2Int[] tests = _wallKickData.GetClockWiseTestOffsets(_rotationState);
         Dictionary<Mino, Vector3Int> nextMinoPos = new Dictionary<Mino, Vector3Int>();
+        Vector2Int offsetTest = Vector2Int.zero;
 
         foreach(Vector2Int offset in tests)
         {
             if (CheckClockwiseRotation(offset, out nextMinoPos))
             {
+                offsetTest = offset;
                 break;
             }
         }
@@ -197,6 +208,9 @@ public class Tetromino : MonoBehaviour
 
         //Increment rotation state, wrap around to zero if greater than 3
         _rotationState = _rotationState < 3 ? _rotationState + 1 : 0;
+        
+        //If the successful offset was zero, this means there was no wall kick
+        LastAction = (offsetTest == Vector2Int.zero) ? TetrominoAction.Rotate_NoWallKick : TetrominoAction.Rotate_WallKick;
 
         return true;
     }
@@ -206,7 +220,7 @@ public class Tetromino : MonoBehaviour
         nextPositions = new Dictionary<Mino, Vector3Int>();
         foreach (Mino m in _minos)
         {
-            var newPos = GetClockwiseRotation(m.CellPos, pivotMino.CellPos);
+            var newPos = GetClockwiseRotation(m.CellPos, _pivotMino.CellPos);
             newPos += new Vector3Int(offset.x, offset.y, 0);
 
             nextPositions.Add(m, newPos);
@@ -227,7 +241,7 @@ public class Tetromino : MonoBehaviour
         nextPositions = new Dictionary<Mino, Vector3Int>();
         foreach (Mino m in _minos)
         {
-            var newPos = GetCounterClockwiseRotation(m.CellPos, pivotMino.CellPos);
+            var newPos = GetCounterClockwiseRotation(m.CellPos, _pivotMino.CellPos);
             newPos += new Vector3Int(offset.x, offset.y, 0);
 
             nextPositions.Add(m, newPos);
@@ -253,7 +267,7 @@ public class Tetromino : MonoBehaviour
 
         // Negate the new y value
         var newRelativePos = new Vector3Int(tempY, tempX * -1, observedPos.z);
-        var newRawPos = pivotMino.CellPos + newRelativePos;
+        var newRawPos = _pivotMino.CellPos + newRelativePos;
 
         return newRawPos;
     }
@@ -267,23 +281,25 @@ public class Tetromino : MonoBehaviour
         var tempY = relativePos.y * -1;
         var newRelativePos = new Vector3Int(tempY, tempX, observedPos.z);
 
-        var newPos = pivotMino.CellPos + newRelativePos;
+        var newPos = _pivotMino.CellPos + newRelativePos;
 
         return newPos;
     }
 
     public bool RotateCounterClockwise()
     {
-        if (pivotMino == null)
+        if (_pivotMino == null)
             return false;
 
         Vector2Int[] tests = _wallKickData.GetCounterClockWiseTestOffsets(_rotationState);
         Dictionary<Mino, Vector3Int> nextMinoPos = new Dictionary<Mino, Vector3Int>();
+        Vector2Int offsetTest = Vector2Int.zero;
 
         foreach (Vector2Int offset in tests)
         {
             if (CheckCounterClockwiseRotation(offset, out nextMinoPos))
             {
+                offsetTest = offset;
                 break;
             }
         }
@@ -299,6 +315,15 @@ public class Tetromino : MonoBehaviour
         }
 
         _rotationState = (_rotationState > 0) ? _rotationState - 1 : 3;
+
+        //If the successful offset was zero, this means there was no wall kick
+        LastAction = (offsetTest == Vector2Int.zero) ? TetrominoAction.Rotate_NoWallKick : TetrominoAction.Rotate_WallKick;
+
         return true;
     }
+}
+
+public enum TetrominoAction
+{
+    Rotate_NoWallKick, Rotate_WallKick, Input, Gravity
 }

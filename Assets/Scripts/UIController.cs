@@ -32,10 +32,10 @@ public class UIController : MonoBehaviour
         _levelText.text = _session.GetCurrentLevel().ToString();
 
         _session.LevelUp += OnLevelUp;
-        _session.ScoreIncreased += UpdateScore;
+        _session.ScoreChanged += UpdateScore;
         _session.Paused += OnPause;
         _session.Unpaused += OnUnpause;
-        _session.GameReset += () => UpdateScore(0,0);
+        _session.GameReset += () => UpdateScore(0);
 
         _board.Lost += OnGameOver;
         _board.BoardReset += OnBoardReset;
@@ -59,7 +59,7 @@ public class UIController : MonoBehaviour
         _timerText.text = _timer.GetElapsedTimeString();
     }
 
-    void UpdateScore(int prevScore, int newScore)
+    void UpdateScore(int newScore)
     {
         _scoreText.text = newScore.ToString();
     }
@@ -72,8 +72,8 @@ public class UIController : MonoBehaviour
     void OnBoardReset()
     {
         _gameOverText.enabled = false;
-        UpdateScore(0, 0);
-        UpdateLevelText(0);
+        UpdateScore(0);
+        UpdateLevelText(1);
     }
 
     void OnLevelUp(int newLevel)

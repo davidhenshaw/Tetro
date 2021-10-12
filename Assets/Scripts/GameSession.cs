@@ -9,7 +9,7 @@ public class GameSession : MonoBehaviour
 
     [Header("Board")]
     [SerializeField] BoardController _board;
-    public event Action<int,int> ScoreIncreased;
+    public event Action<int> ScoreChanged;
     public event Action<int> LevelUp;
     public event Action Paused;
     public event Action Unpaused;
@@ -19,9 +19,13 @@ public class GameSession : MonoBehaviour
     [Header("Scoring")]    
     [SerializeField] int linesPerLevel = 1;
     [SerializeField] int levelBonus = 40;
-    int currScore = 0;
+    int _totalScore = 0;
     int currLevel = 1;
     int numLinesCleared = 0;
+    int _combo = -1;
+    int _backToBackCombo = -1;
+
+    float _backToBackMultiplier = 1.5f;
     int softDropMultiplier = 1;
     int hardDropMultiplier = 2;
 
@@ -51,11 +55,30 @@ public class GameSession : MonoBehaviour
     //State
     bool isGameOver = false;
     bool isPaused = false;
+    bool softDropMode = false;
     bool delayMode = false;
+
+    //Sounds
+    [Header("Sounds")]
+    [SerializeField] AudioClip s_lineClear;
+    [SerializeField] AudioClip s_tetris;
+    [SerializeField] AudioClip s_tSpin;
+    [SerializeField] AudioClip s_tSpinMini;
+    [SerializeField] AudioClip s_levelUp;
+    AudioSource _audioSource;
+
+    public int TotalScore {
+        get => _totalScore;
+        set {
+            _totalScore = value;
+            ScoreChanged?.Invoke(value);
+        }
+    }
 
     private void Awake()
     {
         _gameTimer = FindObjectOfType<GameTimer>();
+        _audioSource = GetComponent<AudioSource>();
         instance = this;
     }
 
@@ -66,7 +89,16 @@ public class GameSession : MonoBehaviour
 
         _board.Lost += OnGameOver;
         _board.BoardAction += OnBoardAction;
-        _board.QuickDropped += OnQuickDrop;
+        _board.HardDropped += OnHardDrop;
+        _board.TetroMovedDown += OnTetrominoGravity;
+    }
+
+    private void OnTetrominoGravity()
+    {
+        if(softDropMode)
+        {
+            TotalScore += softDropMultiplier;
+        }
     }
 
     void Update()
@@ -112,7 +144,7 @@ public class GameSession : MonoBehaviour
 
     public int GetCurrentScore()
     {
-        return currScore;
+        return TotalScore;
     }
 
     public int GetCurrentLevel()
@@ -145,8 +177,8 @@ public class GameSession : MonoBehaviour
         _board.Reset();
         tickTimer = baseTickRate;
         fastTickRate = tickTimer * fastTickMultiplier;
-        currScore = 0;
-        currLevel = 0;
+        TotalScore = 0;
+        currLevel = 1;
         isGameOver = false;
         GameReset?.Invoke();
     }
@@ -156,8 +188,9 @@ public class GameSession : MonoBehaviour
         currTickTime = tickTimer;
     }
 
-    void OnQuickDrop()
+    void OnHardDrop(int lines)
     {
+        TotalScore += lines * hardDropMultiplier;
         SkipToNextTick();
     }
 
@@ -173,15 +206,17 @@ public class GameSession : MonoBehaviour
     {
         if (Input.GetButtonDown("Soft Drop"))
         {
+            softDropMode = true;
             tickTimer = fastTickRate;
         }
 
         if (Input.GetButtonUp("Soft Drop"))
         {
+            softDropMode = false;
             tickTimer = baseTickRate * Mathf.Pow(levelMultiplier, currLevel);
         }
 
-        if(Input.GetButtonDown("CW Rotate") && isGameOver)
+        if(Input.GetButtonDown("Hard Drop") && isGameOver)
         {
             ResetGame();
         }
@@ -195,19 +230,39 @@ public class GameSession : MonoBehaviour
         }
     }
 
+    void ComboBreak()
+    {
+        _combo = -1;
+        _backToBackCombo = -1;
+    }
+
     void OnBoardAction(BoardAction action)
     {
+        if (action.Type == BoardActionType.Null)
+        {
+            ComboBreak();
+            return;
+        }
+
+        PlayActionSound(action.Type);
+
         //Activate line clear delay
         delayMode = true;
 
+        _combo += 1;
+        if (action.Difficult)
+            _backToBackCombo += 1;
+        else
+            _backToBackCombo = -1;
+
         int baseScore = _boardActionLUT[action.Type];
+        if (_backToBackCombo > 0)
+            baseScore = (int)(baseScore * 1.5f);
 
-        int scoreToAdd = baseScore * currLevel;
+        int comboScore = (_combo > 0) ? _combo * currLevel * 50 : 0;
+        int scoreToAdd = baseScore * currLevel + comboScore;
 
-        int prevScore = currScore;
-        currScore += scoreToAdd;
-
-        ScoreIncreased?.Invoke(prevScore, currScore);
+        TotalScore += scoreToAdd;
 
         numLinesCleared += action.LinesCleared;
 
@@ -217,8 +272,36 @@ public class GameSession : MonoBehaviour
         }
     }
 
+    void PlayActionSound(BoardActionType type)
+    {
+        switch(type)
+        {
+            case BoardActionType.Single:
+            case BoardActionType.Double:
+            case BoardActionType.Triple:
+                _audioSource.PlayOneShot(s_lineClear);
+                break;
+
+            case BoardActionType.Tetris:
+                _audioSource.PlayOneShot(s_tetris);
+                break;
+
+            case BoardActionType.T_Spin:
+            case BoardActionType.T_Spin_Double:
+            case BoardActionType.T_Spin_Triple:
+                _audioSource.PlayOneShot(s_tSpin);
+                break;
+
+            case BoardActionType.T_Spin_Mini:
+            case BoardActionType.T_Spin_Mini_Double:
+                _audioSource.PlayOneShot(s_tSpinMini);
+                break;
+        }
+    }
+
     void IncreaseLevel(int numLevels)
     {
+        _audioSource.PlayOneShot(s_levelUp);
         numLinesCleared = 0;
         currLevel+= numLevels;
         LevelUp?.Invoke(currLevel);
