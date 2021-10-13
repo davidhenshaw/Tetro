@@ -254,6 +254,8 @@ public class BoardController : MonoBehaviour
             TetrominoAction tetroAction = _currTetro.LastAction;
             bool t_spin = CheckTSpin(_currTetro);
             _currTetro?.Explode();
+            _currTetro = null;
+
             _emptyRows = ClearLines();
 
             BoardAction boardAction = new BoardAction(_emptyRows.Count, t_spin, tetroAction);
@@ -262,6 +264,13 @@ public class BoardController : MonoBehaviour
             CancelLockMode();
             _audioSource.PlayOneShot(_blockLocked);
         }
+    }
+
+    void SkipLockMode()
+    {
+        _currLockTime = _lockDelay; //max out the lock delay timer so that next tick is immediate
+        _lockMode = true;
+        HandleLockMode();
     }
 
     bool CheckTSpin(Tetromino tetro)
@@ -343,8 +352,7 @@ public class BoardController : MonoBehaviour
         // Move the tetromino down
         t.MoveDown(shortestDist);
 
-        _currLockTime = _lockDelay; //max out the lock delay timer so that next tick is immediate
-        _lockMode = true;
+        SkipLockMode();
 
         HardDropped?.Invoke(shortestDist);
         _audioSource.PlayOneShot(_quickDrop);

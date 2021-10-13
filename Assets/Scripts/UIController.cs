@@ -56,7 +56,7 @@ public class UIController : MonoBehaviour
 
     private void OnBackToBackCombo()
     {
-        throw new System.NotImplementedException();
+        //throw new System.NotImplementedException();
     }
 
     private void OnCombo(int comboNum)

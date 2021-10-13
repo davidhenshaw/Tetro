@@ -190,6 +190,7 @@ public class GameSession : MonoBehaviour
 
     void SkipToNextTick()
     {
+        //_board.Tick();
         currTickTime = tickTimer;
     }
 
