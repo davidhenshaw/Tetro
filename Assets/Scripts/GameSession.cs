@@ -14,6 +14,9 @@ public class GameSession : MonoBehaviour
     public event Action Paused;
     public event Action Unpaused;
     public event Action GameReset;
+    public event Action<int> Combo;
+    public event Action BackToBack;
+    public event Action<int> ComboBroke;
 
     //Scoring
     [Header("Scoring")]    
@@ -60,7 +63,9 @@ public class GameSession : MonoBehaviour
 
     //Sounds
     [Header("Sounds")]
-    [SerializeField] AudioClip s_lineClear;
+    //[SerializeField] AudioClip s_lineClear;
+    [SerializeField] AudioClip s_double;
+    [SerializeField] AudioClip s_triple;
     [SerializeField] AudioClip s_tetris;
     [SerializeField] AudioClip s_tSpin;
     [SerializeField] AudioClip s_tSpinMini;
@@ -232,10 +237,12 @@ public class GameSession : MonoBehaviour
 
     void ComboBreak()
     {
+        ComboBroke?.Invoke(_combo);
         _combo = -1;
         _backToBackCombo = -1;
     }
-
+    
+    //Is called on each line clear
     void OnBoardAction(BoardAction action)
     {
         if (action.Type == BoardActionType.Null)
@@ -256,13 +263,23 @@ public class GameSession : MonoBehaviour
             _backToBackCombo = -1;
 
         int baseScore = _boardActionLUT[action.Type];
+
         if (_backToBackCombo > 0)
+        {
+            BackToBack?.Invoke();
             baseScore = (int)(baseScore * 1.5f);
+        }
 
-        int comboScore = (_combo > 0) ? _combo * currLevel * 50 : 0;
-        int scoreToAdd = baseScore * currLevel + comboScore;
+        int comboScore = 0;
+        if(_combo > 0)
+        {
+            comboScore = _combo * currLevel * 50;
+            Combo?.Invoke(_combo);
+        }
 
-        TotalScore += scoreToAdd;
+        int scoreSubtotal = baseScore * currLevel + comboScore;
+
+        TotalScore += scoreSubtotal;
 
         numLinesCleared += action.LinesCleared;
 
@@ -278,8 +295,10 @@ public class GameSession : MonoBehaviour
         {
             case BoardActionType.Single:
             case BoardActionType.Double:
+                _audioSource.PlayOneShot(s_double);
+                break;
             case BoardActionType.Triple:
-                _audioSource.PlayOneShot(s_lineClear);
+                _audioSource.PlayOneShot(s_triple);
                 break;
 
             case BoardActionType.Tetris:
